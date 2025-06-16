@@ -2,11 +2,11 @@
   "expo": {
     "name": "Threads",
     "slug": "Threads",
-    "scheme": "my-threads", // for deeplinking: my-threads://profile/davekwon
+    "scheme": "my-threads",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",

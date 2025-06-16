@@ -1,11 +1,12 @@
 import { Tabs } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 
+
 export default function TabsLayout() {
     return (
         // color of the icon when the tab is active
         // labels are not shown by default
-    <Tabs screenOptions={{ tabBarActiveTintColor: "#BCC247", tabBarShowLabel: false}}> 
+    <Tabs screenOptions={{ tabBarShowLabel: false}}> 
         // title for each Tabs - how they're displayed in the tab bar
         <Tabs.Screen
             name="index" // name of the screen
