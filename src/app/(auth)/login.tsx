@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
-import { Link, router } from 'expo-router';
+import { Link } from 'expo-router';
+import { supabase } from '@/lib/supabase'; 
 
 export default function LoginScreen() {
   // Form state
@@ -43,29 +44,26 @@ export default function LoginScreen() {
   };
 
   const handleLogin = async () => {
-    if (!validateForm()) return;
+    if (!email || !password) {
+      Alert.alert('Error', 'Email and password are required');
+      return;
+    }
     
     try {
       setIsLoading(true);
-      setErrors(prev => ({ ...prev, general: '' }));
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
       
-      // TODO: Implement actual login logic
-      console.log('Login attempted with:', { email, password });
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // For demo purposes, show success
-      Alert.alert('Success', 'Login successful!');
-      
-      // Navigate to home screen after successful login
-      // router.replace('/(protected)/(tabs)');
+      if (error) {
+        Alert.alert( error.message);
+        return;
+      }
     } catch (error) {
       console.error('Login error:', error);
-      setErrors(prev => ({ 
-        ...prev, 
-        general: 'Failed to login. Please try again.' 
-      }));
+      Alert.alert('Error', error.message);
+
     } finally {
       setIsLoading(false);
     }

@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { Link, router } from 'expo-router';
+import { supabase } from '@/lib/supabase';
 
-export default function LoginScreen() {
+
+export default function SignUpScreen() {
+  
   // Form state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -14,6 +17,8 @@ export default function LoginScreen() {
     password: '',
     general: ''
   });
+
+  
 
   // Validation functions
   const validateEmail = (email: string) => {
@@ -42,34 +47,44 @@ export default function LoginScreen() {
     return !emailError && !passwordError;
   };
 
-  const handleLogin = async () => {
+
+  const handleSignUp = async () => {
     if (!validateForm()) return;
-    
+  
     try {
       setIsLoading(true);
       setErrors(prev => ({ ...prev, general: '' }));
       
-      // TODO: Implement actual login logic
-      console.log('Login attempted with:', { email, password });
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${process.env.EXPO_PUBLIC_APP_URL || 'my-threads://'}(auth)/confirmemail`
+        }
+      });
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      if (error) {
+        Alert.alert('Error', error.message);
+        return;
+      }
       
-      // For demo purposes, show success
-      Alert.alert('Success', 'Login successful!');
+      // Navigate to confirm email page on success
+      router.push({
+        pathname: '/(auth)/confirmemail',
+        params: { email }
+      });
       
-      // Navigate to home screen after successful login
-      // router.replace('/(protected)/(tabs)');
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('Signup error:', error);
       setErrors(prev => ({ 
         ...prev, 
-        general: 'Failed to login. Please try again.' 
+        general: 'Failed to create account. Please try again.' 
       }));
     } finally {
       setIsLoading(false);
     }
   };
+
 
   return (
     <KeyboardAvoidingView 
@@ -143,7 +158,7 @@ export default function LoginScreen() {
         {/* Login Button */}
         <TouchableOpacity
           className={`${isLoading ? 'bg-white' : 'bg-white'} py-4 rounded-lg mb-4 active:bg-gray-200`}
-          onPress={handleLogin}
+          onPress={handleSignUp}
           disabled={isLoading}
         >
           {isLoading ? (
