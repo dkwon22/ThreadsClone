@@ -1,4 +1,39 @@
-import { User, Post } from './types';
+import { User, Post } from '../../../types';
+/**
+ * DummyData Module
+ * 
+ * This file serves as a mock data provider for the application, containing sample data for
+ * users and posts. It's primarily used during development and testing phases before
+ * implementing actual backend integration.
+ * 
+ * Key Components:
+ * 1. dummyUsers: Array of User objects representing application users
+ * 2. dummyPosts: Array of Post objects representing social media posts
+ * 
+ * Role in Application:
+ * - Provides initial data for the main feed (index.tsx)
+ * - Used in PostListItem component for rendering posts
+ * - Supports the social media features like:
+ *   - User profiles
+ *   - Post threading
+ *   - Reply chains
+ *   - User interactions
+ * 
+ * Data Structure:
+ * - Users contain basic profile information (id, username, name, image, bio)
+ * - Posts include content, timestamps, and relationship data (parent_id, replies)
+ * - Implements a threaded structure for replies and conversations
+ * 
+ * Usage:
+ * This module is imported by various components throughout the app to:
+ * - Populate the main feed
+ * - Display user information
+ * - Show post threads and replies
+ * - Demonstrate UI interactions
+ * 
+ * Note: This is temporary development data and should be replaced with
+ * actual API calls in production.
+ */
 
 export const dummyUsers: User[] = [
   {
