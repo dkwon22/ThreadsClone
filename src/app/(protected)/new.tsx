@@ -22,6 +22,7 @@ export default function NewPostScreen() {
                 multiline
                 numberOfLines={4}
                 />
+                
 
                 <View className="mt-auto">
                     <Pressable 
