@@ -1,10 +1,11 @@
-import { FlatList } from 'react-native';
+import { FlatList, ActivityIndicator } from 'react-native';
 import PostListItem from '@/components/PostListItem';
 import { Link } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Post } from '@/types';
 import { supabase } from '@/lib/supabase';
-
+import { useQuery } from '@tanstack/react-query';
+import { Text } from 'react-native';
 /**
  * HomeScreen Component
  * 
@@ -37,27 +38,35 @@ import { supabase } from '@/lib/supabase';
  * content hub where users can view and interact with posts from other users.
  */
 
+
+const fetchPosts = async () => {
+  const { data} = await supabase
+  .from('posts')
+  .select('*, user:profiles(*)')
+  .order('created_at', { ascending: false })
+  .throwOnError();
+
+  return data
+};
+
 export default function HomeScreen() {
-  const [posts,setPosts ] = useState<Post[]>([]);
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      const { data, error} = await supabase.from('posts').select('*, user:profiles(*)').order('created_at', { ascending: false });
-      if (error) {
-        console.error('Error fetching posts:', error);
-        return;
-      }
-      setPosts(data);
-    };
-    fetchPosts();
-  }, []);
 
-console.log(JSON.stringify(posts,null,2));
+  const {data, isLoading, error} = useQuery({
+    queryKey: ['posts'],
+    queryFn: fetchPosts,
+    throwOnError: true, // Automatically throws errors to the error boundary when a query fails
+  });
+
+  if (isLoading) return <ActivityIndicator />;
+  if (error) return <Text>Error: {error.message}</Text>;
+
+//console.log(JSON.stringify(posts,null,2));
 
 // text-2xl is the size of the text, font-bold is the font weight, text-red-500 is the color of the text
   return (
     <FlatList 
-    data={posts}
+    data={data}
     renderItem={({item}) => <PostListItem post={item} />}
     ListHeaderComponent={() => (
       <Link href='/new' className='text-blue-500 p-4 text-center text-3xl'>
