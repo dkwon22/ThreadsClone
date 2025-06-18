@@ -1,5 +1,6 @@
-import { Tabs } from "expo-router";
+import { router, Tabs } from "expo-router";
 import { Feather } from "@expo/vector-icons";
+import { View } from "react-native";
 
 /**
  * TabsLayout Component
@@ -61,6 +62,21 @@ export default function TabsLayout() {
             }}
         />
         <Tabs.Screen 
+            name="plus" 
+            options={{
+                title: "Plus", 
+                tabBarIcon: ({size,color}) => (
+                    <Feather name="plus" size={size} color={color} /> 
+                ),
+            }}
+        listeners={{
+            tabPress: (e) => {
+                e.preventDefault();
+                router.push('/new');
+            },
+        }}
+        />
+        <Tabs.Screen 
             name="notifications" 
             options={{
                 title: "Notifications", 
@@ -78,6 +94,7 @@ export default function TabsLayout() {
                 ),
             }}
         />
+
         </Tabs>
     );
 }
