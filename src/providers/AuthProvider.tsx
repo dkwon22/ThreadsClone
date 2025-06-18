@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User, Subscription } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
+import { ActivityIndicator, View } from 'react-native';
 
 type AuthContextType = {
   user: User | null;
@@ -10,55 +11,61 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-type AuthProviderProps = {
-  children: React.ReactNode;
-};
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context   ) {
+      throw new Error('useAuth must be used within an AuthProvider');
+    }
+    return context;
+  };
+  
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ 
+    children, 
+}) => {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
 
   useEffect(() => {
     // Get the initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+      if (session) {
+        setUser(session.user);
+        setIsAuthenticated(true);
+      }
       setIsLoading(false);
     });
 
+
     // Listen for auth state changes
-    const { data: { subscription } }: { data: { subscription: Subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-      }
-    );
+    const {
+        data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (session) {
+            setUser(session.user);
+            setIsAuthenticated(true);
+        } else {
+            setUser(null);
+            setIsAuthenticated(false);
+        }
+      });
+
 
     // Cleanup subscription on unmount
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+}, []);
 
-  const value = {
-    user,
-    session,
-    isAuthenticated: !!user,
-  };
+if (isLoading) {
+    return (
+        <View className="flex-1 items-center justify-center">
+            <ActivityIndicator size="large" color="0000ff" />
+        </View>
+    );
+}
 
-  if (isLoading) {
-    // You can return a loading spinner or null while checking the initial session
-    return null;
-  }
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
-
-export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+  return <AuthContext.Provider value={{ user, isAuthenticated }}>{children}</AuthContext.Provider>;
 };

@@ -4,6 +4,7 @@ import "../../global.css"
 
 import { Slot, Stack } from "expo-router";
 import { ThemeProvider, DarkTheme } from "@react-navigation/native";
+import { AuthProvider } from "@/providers/AuthProvider";
 
 const myTheme = { //create a new theme that inherits from the dark theme
     ...DarkTheme,
@@ -20,6 +21,8 @@ export default function RootLayout() {
 
 //import { ThemeProvider, DarkTheme } from "@react-navigation/native";
     return <ThemeProvider value={myTheme}> 
+    <AuthProvider>
         <Slot />
+    </AuthProvider>
     </ThemeProvider>;
 }

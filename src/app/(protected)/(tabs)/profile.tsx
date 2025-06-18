@@ -1,4 +1,6 @@
 import { View, Text } from "react-native";
+import { supabase } from "@/lib/supabase";
+
 /**
  * ProfileScreen Component
  * 
@@ -37,6 +39,8 @@ import { View, Text } from "react-native";
 
 export default function ProfileScreen(){
     return (
-            <Text>Profile</Text>
+            <View className="flex-1 items-center justify-center">
+                 <Text onPress={() => supabase.auth.signOut()} className="text-white text-2xl font-bold">Sign out</Text>
+            </View>
     )
 }
