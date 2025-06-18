@@ -1,9 +1,27 @@
 import { useState } from "react";
 import { View, Text, TextInput, Pressable, KeyboardAvoidingView, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/providers/AuthProvider";
 
 export default function NewPostScreen() {
     const [text, setText] = useState('');
+    const { user } = useAuth();
+
+    const onSubmit = async () => {
+        if (!text || !user) return;
+        const { data, error } = await supabase.from('posts').insert({
+            content: text,
+            user_id: user.id,
+            });
+
+        if (error) {
+            console.error('Error creating post:', error);
+            Alert.alert('Error', error.message);
+            return;
+        }
+        setText('');
+    }
     return (
         <SafeAreaView edges={['bottom']} className="p-4 flex-1">
             <KeyboardAvoidingView 
@@ -26,7 +44,7 @@ export default function NewPostScreen() {
 
                 <View className="mt-auto">
                     <Pressable 
-                    onPress={() => console.log('post: ') }
+                    onPress={onSubmit}
                         className = 'bg-white p-3 px-6 self-end rounded-full'>
                         <Text className="text-black font-bold">Post</Text>
                     </Pressable>
